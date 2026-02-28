@@ -14,7 +14,7 @@ export default function PrivacyPage() {
                     <div className="legal-content">
                         <p>Last updated: February 2026</p>
                         <h2>1. Information We Collect</h2>
-                        <p>When you use Milk Ali, we collect the following information:</p>
+                        <p>When you use Milkali, we collect the following information:</p>
                         <ul>
                             <li><strong>Account Information:</strong> Name, email address, phone number, and delivery addresses.</li>
                             <li><strong>Payment Information:</strong> Wallet recharge and transaction data. Payment processing is handled by Razorpay — we do not store card numbers.</li>
@@ -40,16 +40,16 @@ export default function PrivacyPage() {
                         </ul>
 
                         <h2>4. Data Security</h2>
-                        <p>We implement industry-standard security measures including encryption, JWT-based authentication, and secure HTTPS communication to protect your data.</p>
+                        <p>We implement industry-standard security measures including encryption, authentication, and secure HTTPS communication to protect your data.</p>
 
                         <h2>5. Your Rights</h2>
-                        <p>You may request access, correction, or deletion of your personal data by contacting us at <a href="mailto:hello@milkali.com">hello@milkali.com</a>.</p>
+                        <p>You may request access, correction, or deletion of your personal data by contacting us at <a href="mailto:care@milkali.in">care@milkali.in</a>.</p>
 
                         <h2>6. Cookies</h2>
-                        <p>We use essential cookies and local storage for authentication (JWT tokens). We do not use third-party advertising cookies.</p>
+                        <p>We use essential cookies and local storage for authentication. We do not use third-party advertising cookies.</p>
 
                         <h2>7. Contact</h2>
-                        <p>For privacy-related queries, contact us at <a href="mailto:hello@milkali.com">hello@milkali.com</a> or call +91 98765 43210.</p>
+                        <p>For privacy-related queries, contact us at <a href="mailto:care@milkali.in">care@milkali.in</a> or call +91 77100 48128.</p>
                     </div>
                 </div>
             </section>

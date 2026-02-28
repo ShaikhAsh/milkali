@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 
 const SUPPORT_PHONE = '+91 77100 48128'
-const SUPPORT_EMAIL = 'care@milkali.com'
+const SUPPORT_EMAIL = 'care@milkali.in'
 
 export default function ContactPage() {
     const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' })

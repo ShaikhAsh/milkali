@@ -77,21 +77,81 @@ export default function AboutPage() {
                         <h2>Our Commitment</h2>
                     </div>
 
-                    <div style={{ maxWidth: '900px', margin: '0 auto' }} className="reveal">
-                        <h3 style={{ marginBottom: '12px' }}>Our Vision</h3>
-                        <p style={{ marginBottom: '28px', color: 'var(--gray-600)', lineHeight: 1.8 }}>
-                            To become the most trusted daily milk brand for families by delivering purity, consistency and peace of mind in every glass.
-                            We aim to redefine everyday milk consumption from a routine purchase to a reliable health choice.
-                        </p>
+                    <div
+                        style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                            gap: '32px',
+                            maxWidth: '1000px',
+                            margin: '0 auto'
+                        }}
+                        className="stagger-children"
+                    >
 
-                        <h3 style={{ marginBottom: '12px' }}>Our Mission</h3>
-                        <ul style={{ color: 'var(--gray-600)', lineHeight: 1.8, paddingLeft: '20px' }}>
-                            <li>To provide fresh and hygienically handled milk every day</li>
-                            <li>To maintain consistent taste and quality across every delivery</li>
-                            <li>To ensure safe handling and responsible sourcing</li>
-                            <li>To build long-term trust with families through transparency and reliability</li>
-                            <li>To promote better nutrition and healthier lifestyles</li>
-                        </ul>
+                        {/* Vision Card */}
+                        <div className="feature-card reveal-scale" style={{ padding: '40px' }}>
+                            <div
+                                className="feature-icon"
+                                style={{ marginBottom: '20px', fontSize: '28px' }}
+                            >
+                                🔭
+                            </div>
+                            <h3 style={{ marginBottom: '16px' }}>Our Vision</h3>
+                            <p style={{ color: 'var(--gray-600)', lineHeight: 1.8 }}>
+                                To become the most trusted daily milk brand for families by delivering purity,
+                                consistency and peace of mind in every glass.
+                                We aim to redefine everyday milk consumption from a routine purchase
+                                to a reliable health choice.
+                            </p>
+                        </div>
+
+                        {/* Mission Card */}
+                        <div className="feature-card reveal-scale" style={{ padding: '40px' }}>
+                            <div
+                                className="feature-icon"
+                                style={{ marginBottom: '20px', fontSize: '28px' }}
+                            >
+                                🎯
+                            </div>
+
+                            <h3 style={{ marginBottom: '24px' }}>Our Mission</h3>
+
+                            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                {[
+                                    "To provide fresh and hygienically handled milk every day",
+                                    "To maintain consistent taste and quality across every delivery",
+                                    "To ensure safe handling and responsible sourcing",
+                                    "To build long-term trust with families through transparency and reliability",
+                                    "To promote better nutrition and healthier lifestyles"
+                                ].map((item, index) => (
+                                    <li
+                                        key={index}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'flex-start',
+                                            gap: '14px',
+                                            marginBottom: '16px',
+                                            color: 'var(--gray-600)',
+                                            lineHeight: 1.8
+                                        }}
+                                    >
+                                        <span
+                                            style={{
+                                                width: '10px',
+                                                height: '10px',
+                                                background: 'var(--gold-400)',
+                                                borderRadius: '50%',
+                                                marginTop: '7px',
+                                                flexShrink: 0,
+                                                boxShadow: '0 0 0 4px rgba(212,175,55,0.15)'
+                                            }}
+                                        />
+                                        {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
                     </div>
                 </div>
             </section>
@@ -206,7 +266,7 @@ export default function AboutPage() {
                 <div className="container">
                     <div className="cta-banner reveal-scale">
                         <h2>Taste the Difference</h2>
-                        <p>Experience the real taste of pure desi cow milk. Start your subscription today.</p>
+                        <p>Experience the real taste of pure cow milk. Start your subscription today.</p>
                         <a href="/subscriptions" className="btn btn-white btn-lg">Subscribe Now</a>
                     </div>
                 </div>

@@ -68,7 +68,7 @@ export default function Footer() {
                             <ul>
                                 <li><a href="https://wa.me/917710048128" target="_blank" rel="noopener">💬 WhatsApp</a></li>
                                 <li><a href="tel:+917710048128">📞 +91 7710048128</a></li>
-                                <li><a href="mailto:care@milkali.com">✉️ care@milkali.com</a></li>
+                                <li><a href="mailto:care@milkali.in">✉️ care@milkali.in</a></li>
                             </ul>
                             <div style={{ marginTop: '20px' }}>
                                 <div className="mumbai-badge" style={{ display: 'inline-flex', background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)', color: 'var(--gold-400)' }}>

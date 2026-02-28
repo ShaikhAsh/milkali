@@ -24,7 +24,7 @@ export default function RefundPage() {
                         <h2>2. Wallet Refunds</h2>
                         <ul>
                             <li>Unused wallet balance is eligible for refund upon account closure</li>
-                            <li>Refund requests must be made via email to hello@milkali.com</li>
+                            <li>Refund requests must be made via email to care@milkali.in</li>
                             <li>Refunds are processed within 7-10 business days</li>
                             <li>Refunds are credited to the original payment method</li>
                         </ul>
@@ -51,7 +51,7 @@ export default function RefundPage() {
                         </ul>
 
                         <h2>6. Contact for Refunds</h2>
-                        <p>Email <a href="mailto:hello@milkali.com">hello@milkali.com</a> or call +91 98765 43210 during 8 AM — 8 PM, Monday to Saturday.</p>
+                        <p>Email <a href="mailto:care@milkali.in">care@milkali.in</a> or call +91 77100 48128 during 8 AM — 8 PM, Monday to Saturday.</p>
                     </div>
                 </div>
             </section>

@@ -6,7 +6,7 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL =
-  process.env.EMAIL_FROM || "Milkali <onboarding@resend.dev>";
+  process.env.EMAIL_FROM || "Milkali <[EMAIL_ADDRESS]>";
 
 // ───── Shared email wrapper ─────────────────────────────────
 const emailWrapper = (content: string) => `
@@ -21,7 +21,7 @@ const emailWrapper = (content: string) => `
         Milkali
       </div>
       <div style="font-size:11px;color:#B58E3E;letter-spacing:2px;text-transform:uppercase;margin-top:2px;">
-        Premium Desi A2 Cow Milk
+        Premium Cow Milk
       </div>
     </div>
 
@@ -35,7 +35,7 @@ const emailWrapper = (content: string) => `
       <div>© ${new Date().getFullYear()} Dairy Delight Milk and Milk Pvt Ltd</div>
       <div style="margin-top:4px;">Mumbai, Maharashtra · FSSAI Licensed</div>
       <div style="margin-top:8px;">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://milkali.com"}" style="color:#B58E3E;text-decoration:none;">milkali.com</a>
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://milkali.in"}" style="color:#B58E3E;text-decoration:none;">milkali.in</a>
       </div>
     </div>
   </div>
@@ -108,7 +108,7 @@ export async function sendWelcomeEmail(
         <div><span style="color:#B58E3E;font-weight:700;">3.</span> <span style="color:#444;font-size:14px;">Recharge your wallet & start receiving fresh milk!</span></div>
       </div>
 
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://milkali.com"}/subscriptions" 
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://milkali.in"}/subscriptions" 
          style="display:inline-block;background:#002E5B;color:#fff;padding:14px 32px;border-radius:999px;text-decoration:none;font-weight:600;font-size:14px;">
         Subscribe Now →
       </a>
@@ -157,7 +157,7 @@ export async function sendSubscriptionConfirmation(
 
     <div style="text-align:center;">
       <p style="color:#666;font-size:13px;margin:0 0 16px 0;">Manage your subscription anytime from your dashboard.</p>
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://milkali.com"}/dashboard" 
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://milkali.in"}/dashboard" 
          style="display:inline-block;background:#002E5B;color:#fff;padding:12px 28px;border-radius:999px;text-decoration:none;font-weight:600;font-size:14px;">
         View Dashboard →
       </a>
@@ -190,7 +190,7 @@ export async function sendWalletRechargeEmail(
     </div>
 
     <div style="text-align:center;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://milkali.com"}/dashboard/wallet" 
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://milkali.in"}/dashboard/wallet" 
          style="display:inline-block;background:#002E5B;color:#fff;padding:12px 28px;border-radius:999px;text-decoration:none;font-weight:600;font-size:14px;">
         View Wallet →
       </a>
@@ -226,7 +226,7 @@ export async function sendLowBalanceAlert(
 
     <div style="text-align:center;">
       <p style="color:#666;font-size:13px;margin:0 0 16px 0;">Recharge now to avoid interruption in your daily milk delivery.</p>
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://milkali.com"}/dashboard/wallet" 
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://milkali.in"}/dashboard/wallet" 
          style="display:inline-block;background:#E65100;color:#fff;padding:14px 32px;border-radius:999px;text-decoration:none;font-weight:600;font-size:14px;">
         Recharge Wallet →
       </a>
@@ -271,7 +271,7 @@ export async function sendOrderConfirmationEmail(
     </div>
 
     <div style="text-align:center;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://milkali.com"}/dashboard" 
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://milkali.in"}/dashboard" 
          style="display:inline-block;background:#002E5B;color:#fff;padding:12px 28px;border-radius:999px;text-decoration:none;font-weight:600;font-size:14px;">
         Track Order →
       </a>
@@ -308,7 +308,7 @@ export async function sendSubscriptionStatusEmail(
       <p style="color:#666;font-size:14px;line-height:1.7;margin:0 0 8px 0;">${messages[details.action]}</p>
       <p style="color:#999;font-size:13px;margin:0 0 24px 0;">Product: <strong>${details.variant}</strong></p>
       
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://milkali.com"}/dashboard" 
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://milkali.in"}/dashboard" 
          style="display:inline-block;background:#002E5B;color:#fff;padding:12px 28px;border-radius:999px;text-decoration:none;font-weight:600;font-size:14px;">
         View Dashboard →
       </a>
@@ -332,7 +332,7 @@ export async function sendContactNotification(details: {
   message: string;
   type: string;
 }): Promise<boolean> {
-  const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || process.env.DEV_EMAIL_REDIRECT || 'hello@milkali.com';
+  const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || process.env.DEV_EMAIL_REDIRECT || 'care@milkali.in';
 
   const html = emailWrapper(`
     <div style="text-align:center;margin-bottom:20px;">
@@ -371,7 +371,7 @@ export async function sendContactAutoReply(details: {
       <div style="font-size:28px;font-weight:700;color:#002E5B;">#${details.ticketNumber}</div>
     </div>
     <p style="font-size:14px;color:#666;line-height:1.7;">Our support team will review your message and get back to you <strong>within 24 hours</strong> (Mon—Sat, 8 AM—8 PM).</p>
-    <p style="font-size:14px;color:#666;line-height:1.7;">If you need immediate help, contact us on WhatsApp: <a href="https://wa.me/919372236321" style="color:#25D366;font-weight:600;">+91 93722 36321</a></p>
+    <p style="font-size:14px;color:#666;line-height:1.7;">If you need immediate help, contact us on WhatsApp: <a href="https://wa.me/917710048128" style="color:#25D366;font-weight:600;">+91 77100 48128</a></p>
     <p style="font-size:12px;color:#999;margin-top:24px;">Please keep this ticket number for your reference. You don't need to reply to this email.</p>
   `);
 

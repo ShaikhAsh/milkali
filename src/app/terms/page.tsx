@@ -14,10 +14,10 @@ export default function TermsPage() {
                     <div className="legal-content">
                         <p>Last updated: February 2026</p>
                         <h2>1. Acceptance of Terms</h2>
-                        <p>By using Milk Ali (&quot;the Platform&quot;), operated by Dairy Delight Milk and Milk Pvt Ltd, you agree to these Terms of Service.</p>
+                        <p>By using Milkali (&quot;the Platform&quot;), operated by Dairy Delight Milk and Milk Pvt Ltd, you agree to these Terms of Service.</p>
 
                         <h2>2. Service Area</h2>
-                        <p>Milk Ali currently delivers exclusively within Mumbai, Maharashtra. We validate delivery addresses against our serviceable PIN code database. Orders outside our service area will be declined.</p>
+                        <p>Milkali currently delivers exclusively within Mumbai, Maharashtra. We validate delivery addresses against our serviceable PIN code database. Orders outside our service area will be declined.</p>
 
                         <h2>3. Account &amp; Authentication</h2>
                         <p>Accounts are created using email and password. You are responsible for maintaining the security of your credentials. One account per email address is permitted.</p>
@@ -40,16 +40,16 @@ export default function TermsPage() {
                         </ul>
 
                         <h2>6. Product Quality</h2>
-                        <p>We guarantee FSSAI-compliant, lab-tested, unadulterated desi cow milk. If you receive a defective product, please report within 4 hours of delivery for replacement or wallet credit.</p>
+                        <p>We guarantee FSSAI-compliant, lab-tested, unadulterated cow milk. If you receive a defective product, please report within 4 hours of delivery for replacement or wallet credit.</p>
 
                         <h2>7. Limitation of Liability</h2>
-                        <p>Milk Ali is not liable for damages exceeding the value of your most recent order. We are not responsible for delays caused by force majeure events.</p>
+                        <p>Milkali is not liable for damages exceeding the value of your most recent order. We are not responsible for delays caused by force majeure events.</p>
 
                         <h2>8. Governing Law</h2>
                         <p>These terms are governed by the laws of India. Disputes are subject to exclusive jurisdiction of courts in Mumbai, Maharashtra.</p>
 
                         <h2>9. Contact</h2>
-                        <p>For questions about these terms, email <a href="mailto:hello@milkali.com">hello@milkali.com</a>.</p>
+                        <p>For questions about these terms, email <a href="mailto:care@milkali.in">care@milkali.in</a>.</p>
                     </div>
                 </div>
             </section>

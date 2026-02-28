@@ -63,7 +63,7 @@ export default function ProductsPage() {
                                 </div>
                                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px', fontSize: '11px' }}>
                                     <span style={{ background: 'var(--success-bg)', color: 'var(--success)', padding: '4px 10px', borderRadius: '20px', fontWeight: 600 }}>✓ Lab Tested</span>
-                                    <span style={{ background: 'var(--info-bg)', color: 'var(--info)', padding: '4px 10px', borderRadius: '20px', fontWeight: 600 }}>A2 Protein</span>
+                                    <span style={{ background: 'var(--info-bg)', color: 'var(--info)', padding: '4px 10px', borderRadius: '20px', fontWeight: 600 }}>Protein</span>
                                 </div>
                                 <div className="product-actions">
                                     <Link href="/subscriptions" className="btn btn-primary">Subscribe Daily</Link>
@@ -85,7 +85,7 @@ export default function ProductsPage() {
                                 </div>
                                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px', fontSize: '11px' }}>
                                     <span style={{ background: 'var(--success-bg)', color: 'var(--success)', padding: '4px 10px', borderRadius: '20px', fontWeight: 600 }}>✓ Lab Tested</span>
-                                    <span style={{ background: 'var(--info-bg)', color: 'var(--info)', padding: '4px 10px', borderRadius: '20px', fontWeight: 600 }}>A2 Protein</span>
+                                    <span style={{ background: 'var(--info-bg)', color: 'var(--info)', padding: '4px 10px', borderRadius: '20px', fontWeight: 600 }}>Protein</span>
                                 </div>
                                 <div className="product-actions">
                                     <Link href="/subscriptions" className="btn btn-primary">Subscribe Daily</Link>

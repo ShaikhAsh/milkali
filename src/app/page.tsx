@@ -270,7 +270,7 @@ export default function HomePage() {
         <div className="container">
           <div className="section-header reveal">
             <div className="section-label">Our Products</div>
-            <h2>Premium Desi Cow Milk</h2>
+            <h2>Premium Cow Milk</h2>
             <p>One product. Uncompromising quality. Available in two convenient sizes for homes and families across Mumbai.</p>
           </div>
           <div className="products-grid stagger-children">
@@ -281,7 +281,7 @@ export default function HomePage() {
               </div>
               <div className="product-body">
                 <h3>500ml Pack</h3>
-                <p className="product-desc">Perfect for individuals and small families. Fresh desi cow milk in a hygienic glass bottle.</p>
+                <p className="product-desc">Perfect for individuals and small families. Fresh cow milk in a hygienic sealed packet.</p>
                 <div className="price-row">
                   <span className="price-current">₹35</span>
                   <span className="price-mrp">₹45</span>
@@ -300,7 +300,7 @@ export default function HomePage() {
               </div>
               <div className="product-body">
                 <h3>1 Litre Pack</h3>
-                <p className="product-desc">Best value for families. Premium desi cow milk delivered fresh in a sealed glass bottle.</p>
+                <p className="product-desc">Best value for families. Premium cow milk delivered fresh in a sealed packet.</p>
                 <div className="price-row">
                   <span className="price-current">₹65</span>
                   <span className="price-mrp">₹80</span>
@@ -321,7 +321,7 @@ export default function HomePage() {
         <div className="container">
           <div className="section-header reveal">
             <div className="section-label">The Difference</div>
-            <h2>Why Not Packet Milk?</h2>
+            <h2>Why Not Other Packet Milk?</h2>
             <p>See what you&apos;re really putting in your glass. The choice is clear.</p>
           </div>
           <div className="comparison-table reveal-scale">
@@ -331,7 +331,7 @@ export default function HomePage() {
               <span>Other Milk</span>
             </div>
             <div className="comparison-row">
-              <span>A2 Protein (Easy Digestion)</span>
+              <span>Protein (Easy Digestion)</span>
               <span className="comparison-check">✓</span>
               <span className="comparison-cross">✕</span>
             </div>
@@ -428,35 +428,38 @@ export default function HomePage() {
             <div className="step-card">
               <div className="step-number" style={{ background: 'rgba(255,255,255,0.1)', color: 'var(--gold-300)' }}>3</div>
               <h3 style={{ color: '#fff' }}>Enjoy Fresh Milk</h3>
-              <p style={{ color: 'rgba(255,255,255,0.6)' }}>Wake up to farm-fresh desi cow milk at your doorstep every morning by 7 AM.</p>
+              <p style={{ color: 'rgba(255,255,255,0.6)' }}>Wake up to farm-fresh cow milk at your doorstep every morning by 7 AM.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ═══ SUSTAINABILITY (UNIQUE) ═══ */}
+      {/* ═══ RESPONSIBILITY (UPDATED) ═══ */}
       <section className="section">
         <div className="container">
           <div className="section-header reveal">
-            <div className="section-label">Our Impact</div>
-            <h2>Sustainability Matters</h2>
-            <p>By choosing Milkali&apos;s glass bottles over plastic packets, you&apos;re making a real difference.</p>
+            <div className="section-label">Our Commitment</div>
+            <h2>Quality & Responsibility</h2>
+            <p>At Milkali, we focus on delivering fresh milk with hygiene, efficiency, and minimal wastage.</p>
           </div>
+
           <div className="sustainability-grid stagger-children">
             <div className="sustainability-card">
-              <div className="sustainability-icon">🍃</div>
-              <h4>15,000+</h4>
-              <p>Plastic bottles saved every month</p>
+              <div className="sustainability-icon">🥛</div>
+              <h4>Farm-Fresh Daily</h4>
+              <p>Sourced directly from trusted local dairy farms every morning.</p>
             </div>
+
             <div className="sustainability-card">
-              <div className="sustainability-icon">🌍</div>
-              <h4>2.5 Tons</h4>
-              <p>CO₂ emissions reduced annually</p>
+              <div className="sustainability-icon">🛡️</div>
+              <h4>100% Hygienic</h4>
+              <p>Sealed plastic packaging ensures safety, freshness, and zero contamination.</p>
             </div>
+
             <div className="sustainability-card">
-              <div className="sustainability-icon">♻️</div>
-              <h4>98%</h4>
-              <p>Bottle return & reuse rate</p>
+              <div className="sustainability-icon">🚚</div>
+              <h4>Efficient Delivery</h4>
+              <p>Optimized routes reduce fuel usage and ensure timely doorstep delivery.</p>
             </div>
           </div>
         </div>
@@ -536,7 +539,7 @@ export default function HomePage() {
         <div className="container">
           <div className="cta-banner reveal-scale">
             <h2>Start Your Pure Milk Journey</h2>
-            <p>Join 5,000+ Mumbai families who wake up to farm-fresh desi cow milk every morning.</p>
+            <p>Join 5,000+ Mumbai families who wake up to farm-fresh cow milk every morning.</p>
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link href="/subscriptions" className="btn btn-white btn-lg">Subscribe Now</Link>
               <Link href="/contact" className="btn btn-secondary btn-lg" style={{ borderColor: 'rgba(255,255,255,0.3)', color: '#fff' }}>Contact Us</Link>

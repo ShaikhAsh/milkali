@@ -51,7 +51,7 @@ export default function B2BPage() {
                 <div className="container">
                     <div className="section-header">
                         <div className="section-label">B2B Benefits</div>
-                        <h2>Why Partner With Milk Ali?</h2>
+                        <h2>Why Partner With Milkali?</h2>
                         <p>We supply premium cow milk in bulk to businesses across Mumbai</p>
                     </div>
                     <div className="b2b-grid">
