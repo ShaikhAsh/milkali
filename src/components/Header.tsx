@@ -171,7 +171,7 @@ export default function Header() {
                         ) : (
                             <>
                                 <Link href="/auth/login" onClick={() => setDrawerOpen(false)} className="btn btn-ghost btn-block" style={{ marginTop: '8px' }}>Login</Link>
-                                <Link href="/auth/signup" onClick={() => setDrawerOpen(false)} className="btn btn-primary btn-block" style={{ marginTop: '8px' }}>Sign Up</Link>
+                                <Link href="/auth/signup" onClick={() => setDrawerOpen(false)} className="btn btn-primary btn-block" style={{ marginTop: '8px', color: '#fff' }}>Sign Up</Link>
                             </>
                         )}
                     </li>
