@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from './db'
+import './validateEnv'
 
 // ═══════════════════════════════════════════════════════════════
 // AUTH MODULE — Enterprise-Grade Cookie-Based JWT Authentication
@@ -22,7 +23,7 @@ const JWT_SECRET = process.env.JWT_SECRET
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET
 
 if (!JWT_SECRET || !JWT_REFRESH_SECRET) {
-    console.error('❌ FATAL: JWT_SECRET and JWT_REFRESH_SECRET must be set in .env')
+    throw new Error('❌ FATAL: JWT_SECRET and JWT_REFRESH_SECRET must be set in .env')
 }
 
 // ─── Cookie Configuration ───────────────────────────────────
@@ -45,12 +46,12 @@ export interface JWTPayload {
 }
 
 // ─── Token Generation ───────────────────────────────────────
-export function generateToken(payload: JWTPayload): string {
-    return jwt.sign(payload, JWT_SECRET!, { expiresIn: 86400 }) // 24h
+export function generateToken(payload: JWTPayload, tokenVersion: number): string {
+    return jwt.sign({ ...payload, v: tokenVersion }, JWT_SECRET!, { expiresIn: 86400 }) // 24h
 }
 
-export function generateRefreshToken(payload: JWTPayload): string {
-    return jwt.sign(payload, JWT_REFRESH_SECRET!, { expiresIn: 604800 }) // 7d
+export function generateRefreshToken(payload: JWTPayload, tokenVersion: number): string {
+    return jwt.sign({ ...payload, v: tokenVersion }, JWT_REFRESH_SECRET!, { expiresIn: 604800 }) // 7d
 }
 
 // ─── Token Verification ─────────────────────────────────────
@@ -124,10 +125,31 @@ export async function getAuthUser(request: NextRequest) {
     const payload = verifyToken(token)
     if (!payload) return null
 
+    // Minimal select — no wallet/b2bProfile unless caller needs them
     const user = await prisma.user.findUnique({
         where: { id: payload.userId },
-        include: { wallet: true, b2bProfile: true }
+        select: {
+            id: true,
+            email: true,
+            name: true,
+            phone: true,
+            role: true,
+            isActive: true,
+            isVerified: true,
+            tokenVersion: true,
+            referralCode: true,
+            createdAt: true,
+        },
     })
+
+    if (!user) return null
+
+    // Reject banned / deactivated users
+    if (!user.isActive) return null
+
+    // Token version check: reject revoked sessions
+    const tokenVersion = (payload as unknown as Record<string, unknown>).v as number | undefined
+    if (tokenVersion !== undefined && tokenVersion !== user.tokenVersion) return null
 
     return user
 }

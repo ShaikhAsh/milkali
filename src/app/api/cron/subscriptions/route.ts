@@ -47,16 +47,24 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // ─── Calculate tomorrow's date range (IST) ───
-    const now = new Date()
-    const tomorrow = new Date(now)
-    tomorrow.setDate(tomorrow.getDate() + 1)
-    tomorrow.setHours(0, 0, 0, 0)
+    // ─── Calculate tomorrow's date range (IST-safe) ───
+    // IST = UTC + 5:30. We compute IST "now" then derive midnight boundaries.
+    // This is safe regardless of server timezone (Vercel runs UTC).
+    const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000 // +5:30 in milliseconds
+    const nowUtc = Date.now()
+    const nowIst = new Date(nowUtc + IST_OFFSET_MS)
 
-    const dayAfter = new Date(tomorrow)
-    dayAfter.setDate(dayAfter.getDate() + 1)
+    // Tomorrow in IST: advance day, then set to midnight IST
+    const tomorrowIst = new Date(nowIst)
+    tomorrowIst.setUTCDate(tomorrowIst.getUTCDate() + 1)
+    tomorrowIst.setUTCHours(0, 0, 0, 0)
 
-    logger.cron.info(`Processing schedules for ${tomorrow.toISOString().split('T')[0]}`)
+    // Convert IST midnight back to UTC for DB query
+    const tomorrow = new Date(tomorrowIst.getTime() - IST_OFFSET_MS)
+    const dayAfter = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000)
+
+    const istDateStr = tomorrowIst.toISOString().split('T')[0]
+    logger.cron.info(`Processing schedules for IST date: ${istDateStr} (UTC range: ${tomorrow.toISOString()} → ${dayAfter.toISOString()})`)
 
     let processed = 0
     let failed = 0
@@ -196,12 +204,23 @@ async function processOneSchedule(schedule: CronScheduleInput): Promise<Schedule
         const deliveryFee = 0
         const total = dailyCost + deliveryFee
 
-        // ─── Atomic: Check balance + Create order + Debit wallet ───
+        // ─── Atomic: Conditional debit wallet + Create order ───
         await prisma.$transaction(async (tx) => {
-            const wallet = await tx.wallet.findUnique({ where: { userId: user.id } })
-            if (!wallet || wallet.balance < total) {
-                throw new Error(`INSUFFICIENT_BALANCE:₹${wallet?.balance || 0} < ₹${total}`)
+            // ATOMIC CONDITIONAL UPDATE — race-safe, no read-before-write
+            const debitResult = await tx.wallet.updateMany({
+                where: {
+                    userId: user.id,
+                    balance: { gte: total },
+                },
+                data: {
+                    balance: { decrement: total },
+                },
+            })
+            if (debitResult.count === 0) {
+                throw new Error(`INSUFFICIENT_BALANCE:balance < ₹${total}`)
             }
+
+            const wallet = await tx.wallet.findUnique({ where: { userId: user.id } })
 
             const orderNumber = generateOrderNumber()
             const order = await tx.order.create({
@@ -243,14 +262,9 @@ async function processOneSchedule(schedule: CronScheduleInput): Promise<Schedule
                 }
             })
 
-            await tx.wallet.update({
-                where: { userId: user.id },
-                data: { balance: { decrement: total } }
-            })
-
             await tx.walletTransaction.create({
                 data: {
-                    walletId: wallet.id,
+                    walletId: wallet!.id,
                     type: 'DEBIT',
                     amount: total,
                     description: `Subscription delivery: ${variant.product.name} - ${variant.name} ×${schedule.quantity}`,

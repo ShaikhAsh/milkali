@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import AdminSidebar from '@/components/AdminSidebar'
 import Link from 'next/link'
 
 interface Stats {
@@ -55,22 +56,7 @@ export default function AdminDashboard() {
         <>
             <Header />
             <div className="dashboard-layout">
-                <aside className="dashboard-sidebar">
-                    <div className="sidebar-user">
-                        <div className="name">🔑 Admin</div>
-                        <div className="email">{user.email}</div>
-                    </div>
-                    <ul className="sidebar-menu">
-                        <li><Link href="/admin" className="active">📊 Overview</Link></li>
-                        <li><Link href="/admin/orders">📦 Orders</Link></li>
-                        <li><Link href="/admin/users">👥 Users</Link></li>
-                        <li><Link href="/admin/subscriptions">📅 Subscriptions</Link></li>
-                        <li><Link href="/admin/deliveries">🚚 Deliveries</Link></li>
-                        <li><Link href="/admin/coupons">🏷️ Coupons</Link></li>
-                        <li><Link href="/admin/audit">📋 Audit Logs</Link></li>
-                        <li><Link href="/dashboard" style={{ opacity: 0.6 }}>← Back to User</Link></li>
-                    </ul>
-                </aside>
+                <AdminSidebar userEmail={user.email} />
                 <main className="dashboard-content">
                     <div className="dashboard-header">
                         <h1>Admin Dashboard</h1>
@@ -108,21 +94,23 @@ export default function AdminDashboard() {
 
                     <h3 style={{ fontFamily: "'Inter', sans-serif", fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--navy-800)', marginBottom: '16px', marginTop: '32px' }}>Recent Orders</h3>
                     {recentOrders.length > 0 ? (
-                        <div className="data-table">
-                            <table>
-                                <thead><tr><th>Order #</th><th>Customer</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
-                                <tbody>
-                                    {recentOrders.map(o => (
-                                        <tr key={o.id}>
-                                            <td style={{ fontWeight: 600 }}>{o.orderNumber}</td>
-                                            <td>{o.user?.name || o.user?.email || '—'}</td>
-                                            <td>{new Date(o.createdAt).toLocaleDateString('en-IN')}</td>
-                                            <td>₹{o.total}</td>
-                                            <td><span className={`status-badge status-${o.status?.toLowerCase()}`}>{o.status}</span></td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                        <div style={{ overflowX: 'auto' }}>
+                            <div className="data-table">
+                                <table>
+                                    <thead><tr><th>Order #</th><th>Customer</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
+                                    <tbody>
+                                        {recentOrders.map(o => (
+                                            <tr key={o.id}>
+                                                <td style={{ fontWeight: 600 }}>{o.orderNumber}</td>
+                                                <td>{o.user?.name || o.user?.email || '—'}</td>
+                                                <td>{new Date(o.createdAt).toLocaleDateString('en-IN')}</td>
+                                                <td>₹{o.total}</td>
+                                                <td><span className={`status-badge status-${o.status?.toLowerCase()}`}>{o.status}</span></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     ) : (
                         <div className="card" style={{ padding: '48px', textAlign: 'center', color: 'var(--gray-400)' }}>No orders yet.</div>

@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+
 /* ═══════════════════════════════════════════════
    DESIGN SYSTEM — Navy Blue + Gold Premium Dairy
    Inspired by Pride of Cows
@@ -97,6 +98,7 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 body {
@@ -105,6 +107,7 @@ body {
   background: #F8F7F4;
   line-height: 1.7;
   font-size: 15px;
+  overflow-x: hidden;
 }
 
 h1,
@@ -128,6 +131,16 @@ a {
 button {
   cursor: pointer;
   font-family: inherit;
+}
+
+/* Global focus-visible for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--navy-500);
+  outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
 }
 
 img {
@@ -155,10 +168,12 @@ ul {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: clamp(10px, 2.5vw, 13px);
   font-weight: 500;
   letter-spacing: 0.5px;
   overflow: hidden;
+  padding: 0 12px;
+  text-align: center;
 }
 
 .announcement-bar a {
@@ -317,6 +332,7 @@ ul {
   transition: all 0.3s var(--ease-out);
   white-space: nowrap;
   cursor: pointer;
+  min-height: 44px;
 }
 
 .btn:active {
@@ -391,6 +407,7 @@ ul {
 .btn-sm {
   padding: 10px 22px;
   font-size: 12px;
+  min-height: 44px;
 }
 
 .btn-lg {
@@ -449,7 +466,7 @@ ul {
 }
 
 .hero h1 {
-  font-size: 72px;
+  font-size: clamp(1.75rem, 5vw + 1rem, 4.5rem);
   font-weight: 300;
   line-height: 1.05;
   color: var(--navy-800);
@@ -626,7 +643,7 @@ ul {
 }
 
 .section-header h2 {
-  font-size: 48px;
+  font-size: clamp(1.625rem, 3vw + 0.5rem, 3rem);
   font-weight: 400;
   margin-bottom: 16px;
 }
@@ -995,7 +1012,7 @@ ul {
 }
 
 .cta-banner h2 {
-  font-size: 44px;
+  font-size: clamp(1.5rem, 3vw + 0.5rem, 2.75rem);
   color: #fff;
   margin-bottom: 16px;
   position: relative;
@@ -1088,8 +1105,8 @@ ul {
 }
 
 .footer-social a {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
@@ -1115,7 +1132,7 @@ ul {
 }
 
 .page-banner h1 {
-  font-size: 52px;
+  font-size: clamp(1.75rem, 4vw + 0.5rem, 3.25rem);
   color: #fff;
   font-weight: 400;
   margin-bottom: 12px;
@@ -1397,6 +1414,115 @@ textarea.form-input {
   font-size: 14px;
 }
 
+/* ═══ Admin Sidebar Toggle (mobile only) ═══ */
+.admin-sidebar-toggle {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: var(--navy-800);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 20px;
+  min-height: 44px;
+}
+
+.admin-sidebar-toggle span {
+  font-size: 13px;
+}
+
+/* Desktop sidebar (hidden on mobile via media query) */
+.dashboard-sidebar-mobile {
+  display: none;
+}
+
+/* Mobile overlay */
+.admin-sidebar-overlay {
+  display: none;
+}
+
+/* Mobile close button inside drawer */
+.admin-sidebar-close {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-sidebar-desktop {
+    display: none;
+  }
+
+  .admin-sidebar-toggle {
+    display: flex;
+  }
+
+  .admin-sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+  }
+
+  .dashboard-sidebar-mobile {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    z-index: 999;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    padding-top: 16px;
+  }
+
+  .dashboard-sidebar-mobile.open {
+    transform: translateX(0);
+  }
+
+  .admin-sidebar-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .dashboard-content {
+    padding: 20px 16px;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .dashboard-header h1 {
+    font-size: 22px;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+}
+
 /* Stats */
 .stats-row {
   display: grid;
@@ -1446,7 +1572,8 @@ textarea.form-input {
   background: #fff;
   border-radius: var(--radius-lg);
   border: 1px solid var(--gray-200);
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .data-table table {
@@ -1767,7 +1894,11 @@ textarea.form-input {
   border: none;
   font-size: 24px;
   color: var(--navy-800);
-  padding: 4px;
+  padding: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
 }
 
 .mobile-overlay {
@@ -1804,6 +1935,12 @@ textarea.form-input {
   border: none;
   font-size: 24px;
   color: var(--gray-600);
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .mobile-drawer ul {
@@ -1811,12 +1948,14 @@ textarea.form-input {
 }
 
 .mobile-drawer ul li a {
-  display: block;
+  display: flex;
+  align-items: center;
   padding: 14px 0;
   font-size: 16px;
   font-weight: 500;
   color: var(--gray-700);
   border-bottom: 1px solid var(--gray-100);
+  min-height: 44px;
 }
 
 .mobile-drawer ul li a:hover {
@@ -1862,9 +2001,7 @@ textarea.form-input {
     padding: 40px 20px;
   }
 
-  .hero h1 {
-    font-size: 44px;
-  }
+  /* hero h1 sizing handled by clamp() — no override needed */
 
   .hero-desc {
     max-width: 100%;
@@ -1890,9 +2027,6 @@ textarea.form-input {
     padding: 72px 0;
   }
 
-  .section-header h2 {
-    font-size: 34px;
-  }
 
   .features-grid,
   .testimonials-grid,
@@ -1920,9 +2054,6 @@ textarea.form-input {
     padding: 110px 0 48px;
   }
 
-  .page-banner h1 {
-    font-size: 36px;
-  }
 
   .trust-strip-inner {
     gap: 24px;
@@ -1941,43 +2072,6 @@ textarea.form-input {
 
   .cta-banner {
     padding: 48px 24px;
-  }
-
-  .cta-banner h2 {
-    font-size: 30px;
-  }
-
-  .dashboard-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .dashboard-sidebar {
-    position: static;
-    height: auto;
-    padding: 16px 0;
-  }
-
-  .sidebar-menu {
-    display: flex;
-    overflow-x: auto;
-    padding: 0 16px;
-    gap: 0;
-  }
-
-  .sidebar-menu li a {
-    white-space: nowrap;
-    border-left: none;
-    border-bottom: 3px solid transparent;
-    padding: 12px 16px;
-  }
-
-  .sidebar-menu li a.active {
-    border-left-color: transparent;
-    border-bottom-color: var(--gold-500);
-  }
-
-  .dashboard-content {
-    padding: 24px 20px;
   }
 
   .auth-card {
@@ -2186,7 +2280,7 @@ textarea.form-input {
 
 /* ═══════ LOGO ═══════ */
 .logo-img {
-  height: 48px;
+  height: clamp(32px, 4vw, 48px);
   width: auto;
 }
 
@@ -2413,7 +2507,7 @@ textarea.form-input {
 
 .pincode-section h2 {
   color: #fff;
-  font-size: 40px;
+  font-size: clamp(1.5rem, 3vw + 0.5rem, 2.5rem);
   margin-bottom: 12px;
 }
 
@@ -2982,5 +3076,160 @@ textarea.form-input {
 
   .referral-amount {
     font-size: 36px;
+  }
+
+
+  .btn-lg {
+    padding: 14px 28px;
+    font-size: 12px;
+  }
+
+
+
+  .page-banner {
+    padding: 100px 20px 40px;
+  }
+
+
+  .plan-price {
+    font-size: 32px;
+  }
+
+  .freshness-badge {
+    font-size: 12px;
+    padding: 6px 14px;
+  }
+}
+
+/* ═══════ ADDITIONAL RESPONSIVE — Inline Style Grids ═══════ */
+
+/* About page: 2-col brand story → stack on mobile */
+@media (max-width: 768px) {
+  .section>.container>div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+
+  /* Team grid on about page */
+  .section-navy .container>div[style*="repeat(3, 1fr)"] {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* B2B form 2-col grids → stack */
+  form div[style*="gridTemplateColumns"],
+  .card div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Hero float card 2 — hide on mobile */
+  .hero-float-card-2 {
+    display: none;
+  }
+
+  /* Comparison table horizontal scroll */
+  .comparison-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .comparison-header,
+  .comparison-row {
+    min-width: 0;
+    grid-template-columns: 1.5fr 1fr 1fr;
+  }
+
+  /* Freshness badge responsive */
+  .freshness-badge {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+/* ═══════ GOOGLE MAPS EMBED ═══════ */
+.google-maps-container {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--gray-200);
+}
+
+.google-maps-container iframe {
+  width: 100%;
+  height: 400px;
+  border: 0;
+}
+
+@media (max-width: 768px) {
+  .google-maps-container iframe {
+    height: 280px;
+  }
+}
+
+/* ═══════ AREAS SERVED SECTION ═══════ */
+.areas-served-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.area-tag {
+  padding: 10px 16px;
+  background: var(--navy-50);
+  border: 1px solid var(--navy-100);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy-700);
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.area-tag:hover {
+  background: var(--navy-100);
+  border-color: var(--navy-200);
+}
+
+/* ═══════ BLOG CARDS ═══════ */
+@media (max-width: 768px) {
+  .section>.container>div[style*="minmax(340px"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ═══════ FRESHNESS BADGE ═══════ */
+.freshness-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: rgba(5, 150, 105, 0.06);
+  border: 1px solid rgba(5, 150, 105, 0.15);
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--success);
+  margin-bottom: 24px;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--success);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1.3);
   }
 }

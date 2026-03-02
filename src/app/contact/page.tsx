@@ -165,6 +165,48 @@ export default function ContactPage() {
                 </div>
             </section>
 
+            {/* ─── Google Maps ─── */}
+            <section className="section section-cream">
+                <div className="container">
+                    <div className="section-header">
+                        <div className="section-label">Find Us</div>
+                        <h2>Our Location in Mumbai</h2>
+                        <p>Milkali — Premium cow milk delivery across Mumbai &amp; MMR</p>
+                    </div>
+                    <div className="google-maps-container" style={{ maxWidth: '900px', margin: '0 auto' }}>
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d241317.11609823277!2d72.74109995!3d19.08219865!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c6306644edc1%3A0x5da4ed8f8d648c69!2sMumbai%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1709000000000!5m2!1sen!2sin"
+                            allowFullScreen
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            title="Milkali Mumbai - Premium Cow Milk Delivery Service Location"
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── Areas We Serve ─── */}
+            <section className="section">
+                <div className="container">
+                    <div className="section-header">
+                        <div className="section-label">Delivery Areas</div>
+                        <h2>Fresh Milk Delivery Across Mumbai</h2>
+                        <p>We deliver cow milk across all major Mumbai localities, 365 days a year</p>
+                    </div>
+                    <div className="areas-served-grid" style={{ maxWidth: '900px', margin: '0 auto' }}>
+                        {[
+                            'Andheri', 'Bandra', 'Borivali', 'Chembur', 'Colaba',
+                            'Dadar', 'Ghatkopar', 'Goregaon', 'Juhu', 'Kandivali',
+                            'Lower Parel', 'Malad', 'Marine Lines', 'Mulund', 'Navi Mumbai',
+                            'Parel', 'Powai', 'Thane', 'Versova', 'Vikhroli',
+                            'Vile Parle', 'Wadala', 'Worli', 'BKC',
+                        ].map(area => (
+                            <div key={area} className="area-tag">📍 {area}</div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             <Footer />
         </>
     )

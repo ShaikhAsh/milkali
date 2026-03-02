@@ -6,6 +6,7 @@ import { successResponse, errorResponse, generateOrderNumber } from '@/lib/utils
 import { sendOrderConfirmationEmail } from '@/lib/email'
 import { checkAndGrantReferralReward, recalculateAndMaybeRevoke, mlToLitreString } from '@/lib/referral'
 import { reversePointsForOrder } from '@/lib/loyalty'
+import { orderLimiter } from '@/lib/rateLimit'
 
 export async function GET(request: NextRequest) {
     try {
@@ -14,6 +15,8 @@ export async function GET(request: NextRequest) {
 
         const { searchParams } = new URL(request.url)
         const status = searchParams.get('status')
+        const limit = Math.min(Number(searchParams.get('limit')) || 20, 50)
+        const offset = Math.max(Number(searchParams.get('offset')) || 0, 0)
 
         const where: Record<string, unknown> = { userId: user.id }
         if (status) where.status = status
@@ -21,12 +24,27 @@ export async function GET(request: NextRequest) {
         const orders = await prisma.order.findMany({
             where,
             include: {
-                items: { include: { variant: { include: { product: true } } } },
-                address: true,
-                delivery: true,
+                items: {
+                    select: {
+                        id: true,
+                        quantity: true,
+                        price: true,
+                        total: true,
+                        variant: {
+                            select: { name: true, size: true, product: { select: { name: true } } }
+                        },
+                    },
+                },
+                address: {
+                    select: { line1: true, city: true, pincode: true },
+                },
+                delivery: {
+                    select: { status: true, scheduledDate: true, deliveredAt: true },
+                },
             },
             orderBy: { createdAt: 'desc' },
-            take: 50
+            take: limit,
+            skip: offset,
         })
 
         return successResponse(orders)
@@ -44,6 +62,10 @@ export async function POST(request: NextRequest) {
         const body = await request.json()
         const parsed = createOrderSchema.safeParse(body)
         if (!parsed.success) return errorResponse(parsed.error.issues[0].message)
+
+        // Rate limit order creation
+        const { success: rlOk } = await orderLimiter.limit(user.id)
+        if (!rlOk) return errorResponse('Too many requests. Please try again later.', 429)
 
         const { addressId, paymentMethod, deliverySlot, couponCode, notes } = parsed.data
 
@@ -154,20 +176,25 @@ export async function POST(request: NextRequest) {
                 }
             }
 
-            // Handle wallet payment atomically
+            // Handle wallet payment atomically — CONDITIONAL UPDATE (race-safe)
             if (paymentMethod === 'WALLET') {
-                const wallet = await tx.wallet.findUnique({ where: { userId: user.id } })
-                if (!wallet || wallet.balance < total) {
-                    throw new Error(`Insufficient wallet balance. Current: ₹${wallet?.balance || 0}, Required: ₹${total}`)
+                const result = await tx.wallet.updateMany({
+                    where: {
+                        userId: user.id,
+                        balance: { gte: total },
+                    },
+                    data: {
+                        balance: { decrement: total },
+                    },
+                })
+                if (result.count === 0) {
+                    throw new Error(`INSUFFICIENT_BALANCE`)
                 }
 
-                await tx.wallet.update({
-                    where: { userId: user.id },
-                    data: { balance: { decrement: total } }
-                })
+                const wallet = await tx.wallet.findUnique({ where: { userId: user.id } })
                 await tx.walletTransaction.create({
                     data: {
-                        walletId: wallet.id,
+                        walletId: wallet!.id,
                         type: 'DEBIT',
                         amount: total,
                         description: `Order payment`,
@@ -270,8 +297,8 @@ export async function POST(request: NextRequest) {
 
         return successResponse({ order, referralRewardMl: referralResult?.rewarded ? referralResult.rewardMl : undefined }, 201)
     } catch (error) {
-        if (error instanceof Error && error.message.includes('Insufficient wallet')) {
-            return errorResponse(error.message, 400)
+        if (error instanceof Error && error.message.includes('INSUFFICIENT_BALANCE')) {
+            return errorResponse('Insufficient wallet balance', 400)
         }
         if (error instanceof Error && error.message.startsWith('INSUFFICIENT_STOCK:')) {
             return errorResponse(error.message.replace('INSUFFICIENT_STOCK:', ''), 400)

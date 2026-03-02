@@ -22,29 +22,7 @@ import { sendWelcomeEmail } from '@/lib/email'
 // They are set exclusively as HTTP-only cookies via setAuthCookies().
 // ═══════════════════════════════════════════════════════════════
 
-// ─── IP-BASED RATE LIMITING (in-memory) ─────────────────────
-const ipRequestMap = new Map<string, { count: number; resetAt: number }>()
-const IP_LIMIT = 10
-const IP_WINDOW_MS = 60 * 60 * 1000 // 1 hour
-
-function checkIpRateLimit(ip: string): boolean {
-    const now = Date.now()
-    const entry = ipRequestMap.get(ip)
-    if (!entry || now > entry.resetAt) {
-        ipRequestMap.set(ip, { count: 1, resetAt: now + IP_WINDOW_MS })
-        return true
-    }
-    if (entry.count >= IP_LIMIT) return false
-    entry.count++
-    return true
-}
-
-setInterval(() => {
-    const now = Date.now()
-    for (const [ip, entry] of ipRequestMap) {
-        if (now > entry.resetAt) ipRequestMap.delete(ip)
-    }
-}, 10 * 60 * 1000)
+import { authLimiter } from '@/lib/rateLimit'
 
 // ─── Helpers ────────────────────────────────────────────────
 function getClientIp(request: NextRequest): string {
@@ -74,7 +52,8 @@ export async function POST(request: NextRequest) {
             const { email, password, name } = parsed.data
 
             const clientIp = getClientIp(request)
-            if (!checkIpRateLimit(clientIp)) {
+            const { success: rlOk } = await authLimiter.limit(clientIp)
+            if (!rlOk) {
                 return jsonError('Too many requests from this IP. Please try again later.', 429)
             }
 
@@ -154,8 +133,8 @@ export async function POST(request: NextRequest) {
 
             // Build JWT payload with UPPERCASE role
             const payload = { userId: user.id, email: user.email, role: user.role.toUpperCase() }
-            const token = generateToken(payload)
-            const refreshToken = generateRefreshToken(payload)
+            const token = generateToken(payload, user.tokenVersion)
+            const refreshToken = generateRefreshToken(payload, user.tokenVersion)
 
             // Set cookies — do NOT return tokens in JSON
             const response = NextResponse.json({
@@ -185,7 +164,8 @@ export async function POST(request: NextRequest) {
             const { email, password } = parsed.data
 
             const clientIp = getClientIp(request)
-            if (!checkIpRateLimit(clientIp)) {
+            const { success: rlOk } = await authLimiter.limit(clientIp)
+            if (!rlOk) {
                 return jsonError('Too many requests from this IP. Please try again later.', 429)
             }
 
@@ -198,8 +178,8 @@ export async function POST(request: NextRequest) {
 
             // Build JWT payload with UPPERCASE role
             const payload = { userId: user.id, email: user.email, role: user.role.toUpperCase() }
-            const token = generateToken(payload)
-            const refreshToken = generateRefreshToken(payload)
+            const token = generateToken(payload, user.tokenVersion)
+            const refreshToken = generateRefreshToken(payload, user.tokenVersion)
 
             // Set cookies — do NOT return tokens in JSON
             const response = NextResponse.json({
@@ -231,9 +211,15 @@ export async function POST(request: NextRequest) {
             const user = await prisma.user.findUnique({ where: { id: payload.userId } })
             if (!user) return jsonError('User not found', 404)
 
+            // ─── Token Version Check: Reject revoked tokens ───
+            const tokenVersion = (payload as unknown as Record<string, unknown>).v as number | undefined
+            if (tokenVersion !== undefined && tokenVersion !== user.tokenVersion) {
+                return jsonError('Token has been revoked. Please log in again.', 401)
+            }
+
             const newPayload = { userId: user.id, email: user.email, role: user.role.toUpperCase() }
-            const newToken = generateToken(newPayload)
-            const newRefreshToken = generateRefreshToken(newPayload)
+            const newToken = generateToken(newPayload, user.tokenVersion)
+            const newRefreshToken = generateRefreshToken(newPayload, user.tokenVersion)
 
             const response = NextResponse.json({ success: true })
             return setAuthCookies(response, newToken, newRefreshToken)

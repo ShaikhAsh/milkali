@@ -30,9 +30,9 @@ export async function GET(request: NextRequest) {
         const user = await getAuthUser(request)
         if (!user) return errorResponse('Unauthorized', 401)
 
-        // B2C-only: Referral system is exclusively for individual (USER/B2C role) customers
-        if (user.role !== 'USER' && user.role !== 'B2C') {
-            return errorResponse('Referral system is only available for individual users', 403)
+        // B2C-only: Referral system is exclusively for individual customers
+        if (user.role?.toUpperCase() !== 'B2C') {
+            return errorResponse('Referral system is only available for B2C customers', 403)
         }
 
         // Fetch user's referral code + wallet

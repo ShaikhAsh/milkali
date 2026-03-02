@@ -71,6 +71,7 @@ export default function Header() {
                             <span className="pin-icon">📍</span>
                             <input
                                 type="text"
+                                inputMode="numeric"
                                 maxLength={6}
                                 placeholder="PIN Code"
                                 value={pincode}
@@ -164,7 +165,7 @@ export default function Header() {
                     <li style={{ marginTop: '16px' }}>
                         {user ? (
                             <>
-                                <Link href="/dashboard" onClick={() => setDrawerOpen(false)} className="btn btn-primary btn-block" style={{ marginTop: '8px' }}>My Dashboard</Link>
+                                <Link href="/dashboard" onClick={() => setDrawerOpen(false)} className="btn btn-primary btn-block" style={{ marginTop: '8px', color: '#fff' }}>My Dashboard</Link>
                                 <button onClick={() => { setDrawerOpen(false); logout() }} className="btn btn-ghost btn-block" style={{ marginTop: '8px' }}>Logout</button>
                             </>
                         ) : (

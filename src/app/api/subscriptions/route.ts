@@ -13,12 +13,17 @@ export async function GET(request: NextRequest) {
         const subscriptions = await prisma.subscription.findMany({
             where: { userId: user.id },
             include: {
-                variant: { include: { product: true } },
-                address: true,
+                variant: {
+                    select: { name: true, size: true, price: true, product: { select: { name: true } } },
+                },
+                address: {
+                    select: { line1: true, city: true, pincode: true },
+                },
                 schedules: {
                     where: { date: { gte: new Date() } },
                     orderBy: { date: 'asc' },
-                    take: 30,
+                    take: 14,
+                    select: { id: true, date: true, status: true, quantity: true },
                 }
             },
             orderBy: { createdAt: 'desc' }
@@ -40,7 +45,14 @@ export async function POST(request: NextRequest) {
         const parsed = subscriptionSchema.safeParse(body)
         if (!parsed.success) return errorResponse(parsed.error.issues[0].message)
 
-        const { variantId, addressId, frequency, quantity, startDate } = parsed.data
+        const { variantId, addressId, frequency, quantity, startDate, isCustom, deliveryDays } = parsed.data
+
+        // Validate custom subscription
+        if (frequency === 'CUSTOM' || isCustom) {
+            if (!deliveryDays || deliveryDays.length === 0) {
+                return errorResponse('Select at least one delivery day for custom schedule', 400)
+            }
+        }
 
         // Validate variant
         const variant = await prisma.productVariant.findUnique({ where: { id: variantId } })
@@ -68,7 +80,7 @@ export async function POST(request: NextRequest) {
         const dailyCost = variant.price * quantity
         const daysToCheck = frequency === 'DAILY' ? 7 : frequency === 'ALTERNATE' ? 4 : 1
         const requiredBalance = dailyCost * daysToCheck
-        if (!wallet || wallet.balance < requiredBalance) {
+        if (!wallet || Number(wallet.balance) < requiredBalance) {
             return errorResponse(
                 `Insufficient wallet balance. You need at least ₹${requiredBalance} (${daysToCheck} deliveries × ₹${dailyCost}/delivery). Current balance: ₹${wallet?.balance || 0}`,
                 400
@@ -87,6 +99,8 @@ export async function POST(request: NextRequest) {
                 startDate: start,
                 nextDelivery: start,
                 status: 'ACTIVE',
+                isCustom: isCustom || frequency === 'CUSTOM',
+                deliveryDays: deliveryDays ? JSON.stringify(deliveryDays) : null,
             },
             include: {
                 variant: { include: { product: true } },
@@ -97,11 +111,17 @@ export async function POST(request: NextRequest) {
         // Generate delivery schedules for next 30 days
         const schedules = []
         const current = new Date(start)
+        const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
         for (let i = 0; i < 30; i++) {
-            const shouldDeliver =
-                frequency === 'DAILY' ||
-                (frequency === 'ALTERNATE' && i % 2 === 0) ||
-                (frequency === 'WEEKLY' && i % 7 === 0)
+            let shouldDeliver = false
+            if (frequency === 'CUSTOM' && deliveryDays) {
+                shouldDeliver = deliveryDays.includes(dayNames[current.getDay()] as typeof deliveryDays[number])
+            } else {
+                shouldDeliver =
+                    frequency === 'DAILY' ||
+                    (frequency === 'ALTERNATE' && i % 2 === 0) ||
+                    (frequency === 'WEEKLY' && i % 7 === 0)
+            }
 
             if (shouldDeliver) {
                 schedules.push({

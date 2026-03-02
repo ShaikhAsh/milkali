@@ -60,23 +60,14 @@ export default function ReferralDashboard() {
     const [error, setError] = useState('')
     const [copied, setCopied] = useState<'code' | 'link' | null>(null)
 
-    // Debug logging (temporary) — trace the redirect source
-    useEffect(() => {
-        console.log('[ReferralsPage] authLoading:', authLoading, '| user:', user?.email, '| role:', user?.role, '| hasUser:', !!user)
-    }, [user, authLoading])
+    // Role guard handled by middleware.ts — no client-side redirect needed
 
-    // B2C role guard — only redirect if user is fully loaded AND role is explicitly NOT 'USER'
-    // B2C role guard — allow both 'USER' and 'B2C' roles
     useEffect(() => {
-        const allowedRoles = ['USER', 'B2C']
-        if (!authLoading && user && user.role && !allowedRoles.includes(user.role)) {
-            console.log('[ReferralsPage] REDIRECTING to /dashboard because role is:', user.role)
-            router.push('/dashboard')
+        if (!user) return
+        if (user.role?.toUpperCase() !== 'B2C') {
+            setLoading(false)
+            return
         }
-    }, [user, authLoading, router])
-
-    useEffect(() => {
-        if (!user || (user.role !== 'USER' && user.role !== 'B2C')) return
         authFetch('/api/referral')
             .then(d => {
                 if (d.success) setData(d.data)
@@ -107,6 +98,26 @@ export default function ReferralDashboard() {
     }
 
     if (authLoading || !user) return <div className="loader"><div className="spinner" /></div>
+
+    // B2B / non-B2C guard — show friendly message, no API call was made
+    if (user.role?.toUpperCase() !== 'B2C') {
+        return (
+            <>
+                <Header />
+                <div className="dashboard-layout">
+                    <main className="dashboard-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+                        <div className="card" style={{ padding: '48px 32px', textAlign: 'center', maxWidth: '440px' }}>
+                            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🚫</div>
+                            <h1 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--navy-800)', marginBottom: '8px' }}>Referral Program Not Available</h1>
+                            <p style={{ fontSize: '14px', color: 'var(--gray-500)', marginBottom: '24px', lineHeight: 1.6 }}>The referral program is currently available only for B2C customers.</p>
+                            <Link href="/dashboard" className="btn btn-primary">Go to Dashboard</Link>
+                        </div>
+                    </main>
+                </div>
+                <Footer />
+            </>
+        )
+    }
 
     return (
         <>

@@ -95,6 +95,7 @@ export async function GET(request: NextRequest) {
             const profiles = await prisma.b2BProfile.findMany({
                 include: { user: true },
                 orderBy: { createdAt: 'desc' },
+                take: 100,
             })
             return successResponse(profiles)
         }
@@ -102,6 +103,7 @@ export async function GET(request: NextRequest) {
         if (section === 'coupons') {
             const coupons = await prisma.coupon.findMany({
                 orderBy: { createdAt: 'desc' },
+                take: 100,
             })
             return successResponse(coupons)
         }
@@ -109,6 +111,7 @@ export async function GET(request: NextRequest) {
         if (section === 'service-areas') {
             const areas = await prisma.serviceableArea.findMany({
                 orderBy: { pincode: 'asc' },
+                take: 100,
             })
             return successResponse(areas)
         }
@@ -143,6 +146,7 @@ export async function GET(request: NextRequest) {
         if (section === 'inquiries') {
             const inquiries = await prisma.contactInquiry.findMany({
                 orderBy: { createdAt: 'desc' },
+                take: 100,
             })
             return successResponse(inquiries)
         }
@@ -286,6 +290,33 @@ export async function POST(request: NextRequest) {
 
             if (!result.success) return errorResponse(result.reason || 'Failed', 400)
             return successResponse({ message: `${points > 0 ? 'Credited' : 'Debited'} ${Math.abs(points)} loyalty points` })
+        }
+
+        if (action === 'update-coupon') {
+            const { couponId, ...updates } = body
+            if (!couponId) return errorResponse('couponId required', 400)
+            const data: Record<string, unknown> = {}
+            if (updates.code !== undefined) data.code = updates.code.toUpperCase()
+            if (updates.description !== undefined) data.description = updates.description
+            if (updates.type !== undefined) data.type = updates.type
+            if (updates.value !== undefined) data.value = updates.value
+            if (updates.minOrder !== undefined) data.minOrder = updates.minOrder
+            if (updates.maxDiscount !== undefined) data.maxDiscount = updates.maxDiscount
+            if (updates.usageLimit !== undefined) data.usageLimit = updates.usageLimit
+            if (updates.validFrom !== undefined) data.validFrom = new Date(updates.validFrom)
+            if (updates.validUntil !== undefined) data.validUntil = new Date(updates.validUntil)
+            if (updates.isActive !== undefined) data.isActive = updates.isActive
+            const coupon = await prisma.coupon.update({ where: { id: couponId }, data })
+            return successResponse(coupon)
+        }
+
+        if (action === 'delete-coupon') {
+            const { couponId } = body
+            if (!couponId) return errorResponse('couponId required', 400)
+            // Delete usages first, then coupon
+            await prisma.couponUsage.deleteMany({ where: { couponId } })
+            await prisma.coupon.delete({ where: { id: couponId } })
+            return successResponse({ message: 'Coupon deleted' })
         }
 
         return errorResponse('Invalid action', 400)

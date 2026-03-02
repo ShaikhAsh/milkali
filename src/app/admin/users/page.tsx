@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import AdminSidebar from '@/components/AdminSidebar'
 import Link from 'next/link'
 
 interface UserRow {
@@ -52,19 +53,7 @@ export default function AdminUsersPage() {
         <>
             <Header />
             <div className="dashboard-layout">
-                <aside className="dashboard-sidebar">
-                    <div className="sidebar-user"><div className="name">🔑 Admin</div><div className="email">{user.email}</div></div>
-                    <ul className="sidebar-menu">
-                        <li><Link href="/admin">📊 Overview</Link></li>
-                        <li><Link href="/admin/orders">📦 Orders</Link></li>
-                        <li><Link href="/admin/users" className="active">👥 Users</Link></li>
-                        <li><Link href="/admin/subscriptions">📅 Subscriptions</Link></li>
-                        <li><Link href="/admin/deliveries">🚚 Deliveries</Link></li>
-                        <li><Link href="/admin/coupons">🏷️ Coupons</Link></li>
-                        <li><Link href="/admin/audit">📋 Audit Logs</Link></li>
-                        <li><Link href="/dashboard" style={{ opacity: 0.6 }}>← Back to User</Link></li>
-                    </ul>
-                </aside>
+                <AdminSidebar userEmail={user.email} />
                 <main className="dashboard-content">
                     <div className="dashboard-header"><h1>User Management</h1><p>View and manage platform users</p></div>
 
@@ -76,32 +65,34 @@ export default function AdminUsersPage() {
                         ))}
                     </div>
 
-                    <div className="data-table">
-                        <table>
-                            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Wallet</th><th>Orders</th><th>Joined</th><th>Action</th></tr></thead>
-                            <tbody>
-                                {users.map(u => (
-                                    <tr key={u.id}>
-                                        <td style={{ fontWeight: 600 }}>{u.name || '—'}</td>
-                                        <td style={{ fontSize: '13px' }}>{u.email}</td>
-                                        <td style={{ fontSize: '13px' }}>{u.phone || '—'}</td>
-                                        <td><span className={`status-badge ${u.role === 'ADMIN' ? 'status-active' : ''}`}>{u.role}</span></td>
-                                        <td>₹{u.wallet?.balance?.toFixed(2) || '0.00'}</td>
-                                        <td>{u._count?.orders || 0}</td>
-                                        <td style={{ fontSize: '13px' }}>{new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
-                                        <td>
-                                            <select disabled={updating === u.id} value="" onChange={e => e.target.value && handleRoleChange(u.id, e.target.value)}
-                                                className="form-input" style={{ fontSize: '12px', padding: '4px 8px', minWidth: '100px' }}>
-                                                <option value="">Role…</option>
-                                                {u.role !== 'B2C' && <option value="B2C">B2C</option>}
-                                                {u.role !== 'B2B' && <option value="B2B">B2B</option>}
-                                                {u.role !== 'ADMIN' && <option value="ADMIN">ADMIN</option>}
-                                            </select>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <div style={{ overflowX: 'auto' }}>
+                        <div className="data-table">
+                            <table>
+                                <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Wallet</th><th>Orders</th><th>Joined</th><th>Action</th></tr></thead>
+                                <tbody>
+                                    {users.map(u => (
+                                        <tr key={u.id}>
+                                            <td style={{ fontWeight: 600 }}>{u.name || '—'}</td>
+                                            <td style={{ fontSize: '13px' }}>{u.email}</td>
+                                            <td style={{ fontSize: '13px' }}>{u.phone || '—'}</td>
+                                            <td><span className={`status-badge ${u.role === 'ADMIN' ? 'status-active' : ''}`}>{u.role}</span></td>
+                                            <td>₹{u.wallet?.balance ? Number(u.wallet.balance).toFixed(2) : '0.00'}</td>
+                                            <td>{u._count?.orders || 0}</td>
+                                            <td style={{ fontSize: '13px' }}>{new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
+                                            <td>
+                                                <select disabled={updating === u.id} value="" onChange={e => e.target.value && handleRoleChange(u.id, e.target.value)}
+                                                    className="form-input" style={{ fontSize: '12px', padding: '4px 8px', minWidth: '100px' }}>
+                                                    <option value="">Role…</option>
+                                                    {u.role !== 'B2C' && <option value="B2C">B2C</option>}
+                                                    {u.role !== 'B2B' && <option value="B2B">B2B</option>}
+                                                    {u.role !== 'ADMIN' && <option value="ADMIN">ADMIN</option>}
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     {users.length === 0 && <div className="card" style={{ padding: '48px', textAlign: 'center', color: 'var(--gray-400)' }}>No users found.</div>}
                 </main>

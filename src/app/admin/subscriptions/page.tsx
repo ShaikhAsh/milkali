@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import AdminSidebar from '@/components/AdminSidebar'
 import Link from 'next/link'
 
 interface Sub {
@@ -43,19 +44,7 @@ export default function AdminSubscriptionsPage() {
         <>
             <Header />
             <div className="dashboard-layout">
-                <aside className="dashboard-sidebar">
-                    <div className="sidebar-user"><div className="name">🔑 Admin</div><div className="email">{user.email}</div></div>
-                    <ul className="sidebar-menu">
-                        <li><Link href="/admin">📊 Overview</Link></li>
-                        <li><Link href="/admin/orders">📦 Orders</Link></li>
-                        <li><Link href="/admin/users">👥 Users</Link></li>
-                        <li><Link href="/admin/subscriptions" className="active">📅 Subscriptions</Link></li>
-                        <li><Link href="/admin/deliveries">🚚 Deliveries</Link></li>
-                        <li><Link href="/admin/coupons">🏷️ Coupons</Link></li>
-                        <li><Link href="/admin/audit">📋 Audit Logs</Link></li>
-                        <li><Link href="/dashboard" style={{ opacity: 0.6 }}>← Back to User</Link></li>
-                    </ul>
-                </aside>
+                <AdminSidebar userEmail={user.email} />
                 <main className="dashboard-content">
                     <div className="dashboard-header"><h1>Subscriptions</h1><p>View all customer subscriptions</p></div>
 
@@ -68,26 +57,28 @@ export default function AdminSubscriptionsPage() {
                     </div>
 
                     {subs.length > 0 ? (
-                        <div className="data-table">
-                            <table>
-                                <thead><tr><th>Customer</th><th>Product</th><th>Qty</th><th>Frequency</th><th>Daily Cost</th><th>Next Delivery</th><th>Status</th></tr></thead>
-                                <tbody>
-                                    {subs.map(s => (
-                                        <tr key={s.id}>
-                                            <td>
-                                                <div style={{ fontWeight: 600, fontSize: '13px' }}>{s.user?.name || '—'}</div>
-                                                <div style={{ fontSize: '11px', color: 'var(--gray-400)' }}>{s.user?.email}</div>
-                                            </td>
-                                            <td style={{ fontSize: '13px' }}>{s.variant?.product?.name || s.variant?.name} ({s.variant?.size})</td>
-                                            <td>{s.quantity}</td>
-                                            <td>{s.frequency}</td>
-                                            <td style={{ fontWeight: 700 }}>₹{(s.pricePerUnit * s.quantity).toFixed(2)}</td>
-                                            <td style={{ fontSize: '13px' }}>{s.nextDelivery ? new Date(s.nextDelivery).toLocaleDateString('en-IN') : '—'}</td>
-                                            <td><span className={`status-badge status-${s.status?.toLowerCase()}`}>{s.status}</span></td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                        <div style={{ overflowX: 'auto' }}>
+                            <div className="data-table">
+                                <table>
+                                    <thead><tr><th>Customer</th><th>Product</th><th>Qty</th><th>Frequency</th><th>Daily Cost</th><th>Next Delivery</th><th>Status</th></tr></thead>
+                                    <tbody>
+                                        {subs.map(s => (
+                                            <tr key={s.id}>
+                                                <td>
+                                                    <div style={{ fontWeight: 600, fontSize: '13px' }}>{s.user?.name || '—'}</div>
+                                                    <div style={{ fontSize: '11px', color: 'var(--gray-400)' }}>{s.user?.email}</div>
+                                                </td>
+                                                <td style={{ fontSize: '13px' }}>{s.variant?.product?.name || s.variant?.name} ({s.variant?.size})</td>
+                                                <td>{s.quantity}</td>
+                                                <td>{s.frequency}</td>
+                                                <td style={{ fontWeight: 700 }}>₹{(s.pricePerUnit * s.quantity).toFixed(2)}</td>
+                                                <td style={{ fontSize: '13px' }}>{s.nextDelivery ? new Date(s.nextDelivery).toLocaleDateString('en-IN') : '—'}</td>
+                                                <td><span className={`status-badge status-${s.status?.toLowerCase()}`}>{s.status}</span></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     ) : (
                         <div className="card" style={{ padding: '48px', textAlign: 'center', color: 'var(--gray-400)' }}>No subscriptions found.</div>

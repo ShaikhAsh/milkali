@@ -41,6 +41,9 @@ export async function middleware(request: NextRequest) {
     if (CRON_ROUTES.some(r => pathname.startsWith(r))) {
         const auth = request.headers.get('authorization')
         const cronSecret = process.env.CRON_SECRET
+        if (!cronSecret) {
+            console.error('🚨 CRON_SECRET is not configured — all cron requests will be rejected')
+        }
         if (!cronSecret || auth !== `Bearer ${cronSecret}`) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
@@ -75,6 +78,13 @@ export async function middleware(request: NextRequest) {
     // ─── Admin routes: require ADMIN role (case-insensitive) ───
     if (isAdminRoute && user.role.toUpperCase() !== 'ADMIN') {
         return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+
+    // ─── Referral Routes: Require B2C role ───
+    if (pathname.startsWith('/dashboard/referrals')) {
+        if (user.role?.toUpperCase() !== 'B2C') {
+            return NextResponse.redirect(new URL('/dashboard', request.url))
+        }
     }
 
     return NextResponse.next()

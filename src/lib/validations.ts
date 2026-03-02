@@ -41,6 +41,8 @@ export const subscriptionSchema = z.object({
     frequency: z.enum(['DAILY', 'ALTERNATE', 'WEEKLY', 'CUSTOM']),
     quantity: z.number().int().min(1).max(50),
     startDate: z.string(),
+    isCustom: z.boolean().optional(),
+    deliveryDays: z.array(z.enum(['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'])).optional(),
 })
 
 export const walletRechargeSchema = z.object({

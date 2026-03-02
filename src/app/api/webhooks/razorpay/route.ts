@@ -235,11 +235,11 @@ export async function POST(request: NextRequest) {
                             action: 'WEBHOOK_WALLET_CREDIT',
                             entity: 'Wallet',
                             entityId: wallet.id,
-                            details: `Webhook: ₹${amount} credited. Payment: ${razorpayPaymentId}. New balance: ₹${updatedWallet.balance}`,
+                            details: `Webhook: ₹${amount} credited. Payment: ${razorpayPaymentId}. New balance: ₹${Number(updatedWallet.balance)}`,
                         }
                     })
 
-                    logger.payment.info('Wallet credited via webhook', { userId, amount: amount, balance: updatedWallet.balance })
+                    logger.payment.info('Wallet credited via webhook', { userId, amount: amount, balance: Number(updatedWallet.balance) })
                 })
 
                 // Send email (outside transaction — non-critical)
@@ -250,7 +250,7 @@ export async function POST(request: NextRequest) {
                         await sendWalletRechargeEmail(user.email, {
                             name: user.name || 'Customer',
                             amount,
-                            newBalance: wallet.balance,
+                            newBalance: Number(wallet.balance),
                         })
                     }
                 } catch (emailErr) {

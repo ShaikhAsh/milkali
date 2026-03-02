@@ -23,6 +23,7 @@ model User {
   referralCode      String?            @unique
   referredById      String?
   signupIp          String?
+  tokenVersion      Int                @default(1)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   addresses         Address[]
@@ -148,6 +149,8 @@ model Order {
   @@index([userId])
   @@index([addressId])
   @@index([couponId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model OrderItem {
@@ -179,6 +182,8 @@ model Subscription {
   resumeAt     DateTime?
   nextDelivery DateTime?
   cutoffTime   String                 @default("20:00")
+  isCustom     Boolean                @default(false)
+  deliveryDays String?
   createdAt    DateTime               @default(now())
   updatedAt    DateTime               @updatedAt
   address      Address                @relation(fields: [addressId], references: [id])
@@ -189,6 +194,7 @@ model Subscription {
   @@index([userId])
   @@index([variantId])
   @@index([addressId])
+  @@index([status])
 }
 
 model SubscriptionSchedule {
@@ -202,12 +208,13 @@ model SubscriptionSchedule {
 
   @@unique([subscriptionId, date])
   @@index([subscriptionId])
+  @@index([date, status])
 }
 
 model Wallet {
   id           String              @id @default(uuid())
   userId       String              @unique
-  balance      Float               @default(0)
+  balance      Decimal             @default(0) @db.Decimal(10, 2)
   milkCreditMl Int                 @default(0)
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
@@ -219,7 +226,7 @@ model WalletTransaction {
   id          String   @id @default(uuid())
   walletId    String
   type        String
-  amount      Float
+  amount      Decimal  @db.Decimal(10, 2)
   amountMl    Int?     @default(0)
   description String
   reference   String?  @unique
@@ -227,6 +234,7 @@ model WalletTransaction {
   wallet      Wallet   @relation(fields: [walletId], references: [id])
 
   @@index([walletId])
+  @@index([walletId, createdAt])
 }
 
 model Payment {
@@ -325,6 +333,9 @@ model DeliverySchedule {
   updatedAt         DateTime  @updatedAt
   deliveryPartner   User?     @relation("DeliveryPartner", fields: [deliveryPartnerId], references: [id])
   order             Order     @relation(fields: [orderId], references: [id])
+
+  @@index([scheduledDate])
+  @@index([status])
 }
 
 model ServiceableArea {
@@ -344,6 +355,9 @@ model AuditLog {
   entityId  String?
   details   String?
   ipAddress String?
+  oldValue  String?
+  newValue  String?
+  userAgent String?
   createdAt DateTime @default(now())
   user      User?    @relation(fields: [userId], references: [id])
 
@@ -395,6 +409,9 @@ model ReferralReward {
 
   @@index([referrerId])
   @@index([signupIp])
+  @@index([signupIp, createdAt])
+  @@index([referrerId, createdAt])
+  @@index([deviceHash, createdAt])
 }
 
 model ReferralConfig {

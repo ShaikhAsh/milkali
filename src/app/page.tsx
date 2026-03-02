@@ -118,11 +118,10 @@ export default function HomePage() {
               Milked {freshHours} hours ago — delivered fresh to you
             </div>
             <h1>
-              Cow <em>Milk</em>
+              Pure Cow <em>Milk</em> Delivered Fresh in Mumbai
             </h1>
             <p className="hero-desc">
-              Unadulterated cow milk from indigenous Indian cow breeds.
-              Delivered fresh from village farms to your Mumbai doorstep every morning by 7 AM.
+              Farm-fresh cow milk from indigenous Indian breeds, delivered to your Mumbai doorstep every morning by 7 AM. Zero preservatives. Lab-tested daily. Subscribe from ₹35/day.
             </p>
             <div className="hero-cta-row">
               <Link href="/subscriptions" className="btn btn-primary btn-lg">Subscribe Now</Link>
@@ -131,10 +130,13 @@ export default function HomePage() {
           </div>
           <div className="hero-visual">
             <div className="hero-image-wrap">
-              <img
-                src="images/instagram/img3.jpeg"
-                alt="Fresh milk being poured into a glass"
-                style={{ aspectRatio: '5/6' }}
+              <Image
+                src="/images/instagram/img3.jpeg"
+                alt="Fresh Premium cow milk being poured into a glass — Milkali Mumbai"
+                width={500}
+                height={600}
+                priority
+                style={{ width: '100%', height: 'auto', borderRadius: 'var(--radius-xl)', objectFit: 'cover' }}
               />
             </div>
             <div className="hero-float-card">
@@ -193,8 +195,8 @@ export default function HomePage() {
         <div className="container">
           <div className="section-header reveal">
             <div className="section-label">Why Choose Us</div>
-            <h2>The Milkali Promise</h2>
-            <p>Every glass of Milkali carries the goodness of pure A2 desi cow milk — from healthy, well-cared-for cows on lush village farms.</p>
+            <h2>Why Mumbai Families Choose Milkali</h2>
+            <p>Every glass of Milkali carries the goodness of pure cow milk — from healthy, well-cared-for indigenous cows on lush village farms, delivered fresh to your Mumbai doorstep.</p>
           </div>
           <div className="features-grid stagger-children">
             <div className="feature-card">
@@ -270,14 +272,14 @@ export default function HomePage() {
         <div className="container">
           <div className="section-header reveal">
             <div className="section-label">Our Products</div>
-            <h2>Premium Cow Milk</h2>
-            <p>One product. Uncompromising quality. Available in two convenient sizes for homes and families across Mumbai.</p>
+            <h2>Premium Cow Milk — Fresh Farm Milk Subscription</h2>
+            <p>One product. Uncompromising quality. Available in two convenient sizes for homes and families across Mumbai. Start your daily milk subscription today.</p>
           </div>
           <div className="products-grid stagger-children">
             <div className="product-card reveal-scale">
               <div className="product-badge">Popular</div>
               <div className="product-image">
-                <img src="images/instagram/img3.jpeg" alt="500ml Milk" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <Image src="/images/instagram/img3.jpeg" alt="Milkali 500ml Premium cow milk pack" width={400} height={280} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div className="product-body">
                 <h3>500ml Pack</h3>
@@ -296,7 +298,7 @@ export default function HomePage() {
             <div className="product-card reveal-scale">
               <div className="product-badge" style={{ background: 'var(--navy-800)' }}>Value</div>
               <div className="product-image">
-                <img src="images/instagram/img1.jpg" alt="1 Litre Milk" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <Image src="/images/instagram/img1.jpg" alt="Milkali 1 litre Premium cow milk pack" width={400} height={280} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div className="product-body">
                 <h3>1 Litre Pack</h3>
@@ -372,6 +374,7 @@ export default function HomePage() {
           <div className="pincode-input-row">
             <input
               type="text"
+              inputMode="numeric"
               maxLength={6}
               placeholder="Enter Pincode"
               value={pincodeCheck}
@@ -538,8 +541,8 @@ export default function HomePage() {
       <section className="section">
         <div className="container">
           <div className="cta-banner reveal-scale">
-            <h2>Start Your Pure Milk Journey</h2>
-            <p>Join 5,000+ Mumbai families who wake up to farm-fresh cow milk every morning.</p>
+            <h2>Start Your Pure Milk Subscription Today</h2>
+            <p>Join 5,000+ Mumbai families who wake up to farm-fresh Premium cow milk every morning. Pure cow milk near you, delivered daily.</p>
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link href="/subscriptions" className="btn btn-white btn-lg">Subscribe Now</Link>
               <Link href="/contact" className="btn btn-secondary btn-lg" style={{ borderColor: 'rgba(255,255,255,0.3)', color: '#fff' }}>Contact Us</Link>

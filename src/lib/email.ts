@@ -53,19 +53,10 @@ interface EmailOptions {
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   try {
-    const redirectEmail = process.env.DEV_EMAIL_REDIRECT;
-
-    // If redirect is set → send ONLY to admin
-    const finalTo = redirectEmail ? redirectEmail : options.to;
-
-    const subjectPrefix = redirectEmail
-      ? `[DEV REDIRECT for ${options.to}] `
-      : "";
-
     const sendPayload: Record<string, string> = {
       from: FROM_EMAIL,
-      to: finalTo,
-      subject: subjectPrefix + options.subject,
+      to: options.to,
+      subject: options.subject,
       html: options.html,
     };
     if (options.replyTo) sendPayload.reply_to = options.replyTo;
@@ -78,7 +69,6 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       return false;
     }
 
-    console.log("✅ Email sent to", finalTo, "| id:", data?.id);
     return true;
   } catch (err) {
     console.error("❌ Email send failed:", err);
@@ -332,7 +322,7 @@ export async function sendContactNotification(details: {
   message: string;
   type: string;
 }): Promise<boolean> {
-  const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || process.env.DEV_EMAIL_REDIRECT || 'care@milkali.in';
+  const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || 'care@milkali.in';
 
   const html = emailWrapper(`
     <div style="text-align:center;margin-bottom:20px;">

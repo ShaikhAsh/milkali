@@ -126,10 +126,13 @@ export function parseSizeToMl(size: string): number {
  * Only CONFIRMED + DELIVERED status.
  */
 async function calculateTotalDeliveredMl(userId: string, tx: TxClient): Promise<number> {
+    // ⚠️ SECURITY: Only count DELIVERED orders toward referral threshold.
+    // CONFIRMED orders have NOT been fulfilled yet and can be cancelled.
+    // Counting them would allow reward farming via place-reward-cancel loops.
     const orders = await tx.order.findMany({
         where: {
             userId,
-            status: { in: ['CONFIRMED', 'DELIVERED'] },
+            status: 'DELIVERED',
         },
         select: {
             items: {

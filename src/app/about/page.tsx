@@ -1,6 +1,7 @@
 'use client'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Image from 'next/image'
 import { useEffect } from 'react'
 
 function useReveal() {
@@ -60,9 +61,11 @@ export default function AboutPage() {
                         </div>
 
                         <div className="reveal-right">
-                            <img
+                            <Image
                                 src="https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=600&h=500&fit=crop"
-                                alt="Green farmland with cows"
+                                alt="Lush green farmland with healthy cows — Milkali cow milk source"
+                                width={600}
+                                height={500}
                                 style={{ width: '100%', borderRadius: 'var(--radius-xl)', objectFit: 'cover', aspectRatio: '6/5', boxShadow: '0 20px 60px rgba(0,46,91,0.12)' }}
                             />
                         </div>

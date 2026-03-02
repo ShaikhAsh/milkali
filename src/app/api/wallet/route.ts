@@ -3,6 +3,7 @@ import prisma from '@/lib/db'
 import { getAuthUser } from '@/lib/auth'
 import { successResponse, errorResponse } from '@/lib/utils'
 import { sendWalletRechargeEmail } from '@/lib/email'
+import { walletLimiter } from '@/lib/rateLimit'
 import crypto from 'crypto'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -10,9 +11,6 @@ const RazorpaySDK = require('razorpay')
 
 function getRazorpayInstance() {
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-        return null
-    }
-    if (process.env.RAZORPAY_KEY_ID === 'rzp_test_demo') {
         return null
     }
     return new RazorpaySDK({
@@ -41,10 +39,10 @@ export async function GET(request: NextRequest) {
                 data: { userId: user.id, balance: 0, milkCreditMl: 0 },
                 include: { transactions: true }
             })
-            return successResponse(newWallet)
+            return successResponse({ ...newWallet, balance: Number(newWallet.balance) })
         }
 
-        return successResponse(wallet)
+        return successResponse({ ...wallet, balance: Number(wallet.balance) })
     } catch (error) {
         console.error('Wallet GET error:', error)
         return errorResponse('Failed to fetch wallet', 500)
@@ -58,6 +56,10 @@ export async function POST(request: NextRequest) {
 
         const body = await request.json()
         const { action } = body
+
+        // Rate limit wallet mutations
+        const { success: rlOk } = await walletLimiter.limit(user.id)
+        if (!rlOk) return errorResponse('Too many requests. Please try again later.', 429)
 
         // Step 1: Create Razorpay order
         if (action === 'create-order' || !action) {
@@ -113,7 +115,9 @@ export async function POST(request: NextRequest) {
 
         // Step 2: Verify Razorpay payment and credit wallet
         if (action === 'verify-payment') {
-            const { razorpayOrderId, razorpayPaymentId, razorpaySignature, amount } = body
+            const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = body
+            // ⚠️ SECURITY: `amount` from request body is INTENTIONALLY IGNORED.
+            // We ONLY trust the amount stored in our Payment DB record.
 
             if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
                 return errorResponse('Payment verification details required', 400)
@@ -126,10 +130,33 @@ export async function POST(request: NextRequest) {
             if (alreadyCredited) {
                 const wallet = await prisma.wallet.findUnique({ where: { userId: user.id } })
                 return successResponse({
-                    balance: wallet?.balance || 0,
+                    balance: wallet ? Number(wallet.balance) : 0,
                     message: 'Payment already processed',
                 })
             }
+
+            // ─── Fetch trusted amount from Payment record ───
+            const paymentRecord = await prisma.payment.findUnique({
+                where: { razorpayOrderId }
+            })
+            if (!paymentRecord) {
+                console.error('❌ No Payment record found for razorpayOrderId:', razorpayOrderId)
+                return errorResponse('Payment record not found. Contact support.', 400)
+            }
+            if (paymentRecord.status === 'SUCCESS') {
+                const wallet = await prisma.wallet.findUnique({ where: { userId: user.id } })
+                return successResponse({
+                    balance: wallet ? Number(wallet.balance) : 0,
+                    message: 'Payment already processed',
+                })
+            }
+            if (paymentRecord.userId !== user.id) {
+                console.error('❌ Payment userId mismatch:', { expected: paymentRecord.userId, got: user.id })
+                return errorResponse('Payment verification failed', 403)
+            }
+
+            // The ONLY trusted amount — from our own DB, set during create-order
+            const trustedAmount = paymentRecord.amount
 
             // Verify signature
             const generatedSignature = crypto
@@ -142,7 +169,7 @@ export async function POST(request: NextRequest) {
                 return errorResponse('Payment verification failed', 400)
             }
 
-            // Signature valid — credit wallet inside transaction
+            // Signature valid — credit wallet inside transaction using TRUSTED amount
             const result = await prisma.$transaction(async (tx) => {
                 let wallet = await tx.wallet.findUnique({ where: { userId: user.id } })
                 if (!wallet) {
@@ -151,22 +178,22 @@ export async function POST(request: NextRequest) {
 
                 const updatedWallet = await tx.wallet.update({
                     where: { userId: user.id },
-                    data: { balance: { increment: amount } }
+                    data: { balance: { increment: trustedAmount } }
                 })
 
                 await tx.walletTransaction.create({
                     data: {
                         walletId: wallet.id,
                         type: 'CREDIT',
-                        amount,
-                        description: `Wallet recharge of ₹${amount}`,
+                        amount: trustedAmount,
+                        description: `Wallet recharge of ₹${trustedAmount}`,
                         reference: razorpayPaymentId,
                     }
                 })
 
                 // Update Payment record to SUCCESS
-                await tx.payment.updateMany({
-                    where: { razorpayOrderId },
+                await tx.payment.update({
+                    where: { id: paymentRecord.id },
                     data: {
                         status: 'SUCCESS',
                         razorpayPaymentId,
@@ -180,7 +207,7 @@ export async function POST(request: NextRequest) {
                         action: 'WALLET_RECHARGE',
                         entity: 'Wallet',
                         entityId: wallet.id,
-                        details: `Razorpay recharge ₹${amount}. Payment: ${razorpayPaymentId}. New balance: ₹${updatedWallet.balance}`,
+                        details: `Razorpay recharge ₹${trustedAmount}. Payment: ${razorpayPaymentId}. New balance: ₹${updatedWallet.balance}`,
                     }
                 })
 
@@ -191,14 +218,14 @@ export async function POST(request: NextRequest) {
             if (user.email) {
                 await sendWalletRechargeEmail(user.email, {
                     name: user.name || 'Customer',
-                    amount,
-                    newBalance: result.balance,
+                    amount: trustedAmount,
+                    newBalance: Number(result.balance),
                 })
             }
 
             return successResponse({
-                balance: result.balance,
-                message: `₹${amount} added to wallet successfully`,
+                balance: Number(result.balance),
+                message: `₹${trustedAmount} added to wallet successfully`,
             })
         }
 

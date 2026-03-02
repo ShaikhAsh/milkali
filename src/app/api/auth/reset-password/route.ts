@@ -4,31 +4,7 @@ import prisma from '@/lib/db'
 import { hashPassword } from '@/lib/auth'
 import { successResponse, errorResponse } from '@/lib/utils'
 import { sendPasswordResetEmail } from '@/lib/email'
-
-// ─── Rate Limiting: 5 requests per IP per 15 minutes ───
-const resetIpMap = new Map<string, { count: number; resetAt: number }>()
-const RESET_LIMIT = 5
-const RESET_WINDOW = 15 * 60 * 1000
-
-function checkResetRateLimit(ip: string): boolean {
-    const now = Date.now()
-    const entry = resetIpMap.get(ip)
-    if (!entry || now > entry.resetAt) {
-        resetIpMap.set(ip, { count: 1, resetAt: now + RESET_WINDOW })
-        return true
-    }
-    if (entry.count >= RESET_LIMIT) return false
-    entry.count++
-    return true
-}
-
-// Clean stale entries every 5 minutes
-setInterval(() => {
-    const now = Date.now()
-    for (const [ip, entry] of resetIpMap) {
-        if (now > entry.resetAt) resetIpMap.delete(ip)
-    }
-}, 5 * 60 * 1000)
+import { resetPasswordLimiter } from '@/lib/rateLimit'
 
 // SHA-256 hash for reset tokens (fast, suitable for single-use tokens)
 function hashToken(token: string): string {
@@ -54,7 +30,8 @@ export async function POST(request: NextRequest) {
             const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
                 || request.headers.get('x-real-ip')
                 || 'unknown'
-            if (!checkResetRateLimit(ip)) {
+            const { success: rlOk } = await resetPasswordLimiter.limit(ip)
+            if (!rlOk) {
                 return errorResponse('Too many requests. Please try again later.', 429)
             }
 
@@ -118,7 +95,8 @@ export async function POST(request: NextRequest) {
             const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
                 || request.headers.get('x-real-ip')
                 || 'unknown'
-            if (!checkResetRateLimit(ip)) {
+            const { success: rlOk } = await resetPasswordLimiter.limit(ip)
+            if (!rlOk) {
                 return errorResponse('Too many requests. Please try again later.', 429)
             }
 

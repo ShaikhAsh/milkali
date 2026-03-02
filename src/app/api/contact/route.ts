@@ -4,31 +4,16 @@ import { getAuthUser } from '@/lib/auth'
 import { contactSchema, b2bInquirySchema } from '@/lib/validations'
 import { successResponse, errorResponse } from '@/lib/utils'
 import { sendContactNotification, sendContactAutoReply } from '@/lib/email'
-
-// ─── Simple in-memory rate limit: 5 submissions per IP per hour ───
-const ipMap = new Map<string, { count: number; resetAt: number }>()
-const LIMIT = 5
-const WINDOW = 60 * 60 * 1000
-
-function checkRateLimit(ip: string): boolean {
-    const now = Date.now()
-    const entry = ipMap.get(ip)
-    if (!entry || now > entry.resetAt) {
-        ipMap.set(ip, { count: 1, resetAt: now + WINDOW })
-        return true
-    }
-    if (entry.count >= LIMIT) return false
-    entry.count++
-    return true
-}
+import { contactLimiter } from '@/lib/rateLimit'
 
 export async function POST(request: NextRequest) {
     try {
-        // Rate limit by IP
+        // Rate limit by IP (Upstash Redis-backed)
         const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
             || request.headers.get('x-real-ip')
             || 'unknown'
-        if (!checkRateLimit(ip)) {
+        const { success: rlOk } = await contactLimiter.limit(ip)
+        if (!rlOk) {
             return errorResponse('Too many submissions. Please try again later.', 429)
         }
 

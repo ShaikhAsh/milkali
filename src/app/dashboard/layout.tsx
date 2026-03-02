@@ -8,15 +8,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const router = useRouter()
     const pathname = usePathname()
 
-    // Debug logging (temporary)
-    useEffect(() => {
-        console.log('[DashboardLayout] pathname:', pathname, '| user:', user?.email, '| role:', user?.role, '| loading:', loading)
-    }, [pathname, user, loading])
-
     useEffect(() => {
         if (!loading && !user) {
-            // Not logged in → redirect to login, preserving intended destination
-            router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`)
+            // Not logged in → replace (not push) to prevent back-button loop
+            router.replace(`/auth/login?redirect=${encodeURIComponent(pathname)}`)
         }
         // DO NOT redirect logged-in users — allow all sub-routes to render
     }, [user, loading, router, pathname])

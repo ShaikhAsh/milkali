@@ -47,11 +47,12 @@ export default function SubscriptionPage() {
     const [addresses, setAddresses] = useState<Address[]>([])
     const [selectedVariantId, setSelectedVariantId] = useState('')
     const [selectedAddressId, setSelectedAddressId] = useState('')
-    const [frequency, setFrequency] = useState<'DAILY' | 'ALTERNATE' | 'WEEKLY'>('DAILY')
+    const [frequency, setFrequency] = useState<'DAILY' | 'ALTERNATE' | 'WEEKLY' | 'CUSTOM'>('DAILY')
     const [quantity, setQuantity] = useState(1)
     const [startDate, setStartDate] = useState('')
     const [creating, setCreating] = useState(false)
     const [walletBalance, setWalletBalance] = useState<number | null>(null)
+    const [deliveryDays, setDeliveryDays] = useState<string[]>([])
 
     // Auth redirect handled by dashboard/layout.tsx
     useEffect(() => { if (user) { fetchSubs(); fetchFormData() } }, [user]) // eslint-disable-line
@@ -111,6 +112,7 @@ export default function SubscriptionPage() {
                 frequency,
                 quantity,
                 startDate,
+                ...(frequency === 'CUSTOM' ? { isCustom: true, deliveryDays } : {}),
             })
         })
 
@@ -140,7 +142,7 @@ export default function SubscriptionPage() {
     // Calculate required balance for selected plan
     const selectedVariant = variants.find(v => v.id === selectedVariantId)
     const dailyCost = selectedVariant ? selectedVariant.price * quantity : 0
-    const daysNeeded = frequency === 'DAILY' ? 7 : frequency === 'ALTERNATE' ? 4 : 1
+    const daysNeeded = frequency === 'DAILY' ? 7 : frequency === 'ALTERNATE' ? 4 : frequency === 'CUSTOM' ? (deliveryDays.length || 1) : 1
     const requiredBalance = dailyCost * daysNeeded
 
     return (
@@ -282,10 +284,11 @@ export default function SubscriptionPage() {
                                             { value: 'DAILY', label: 'Every Day', desc: '30 deliveries/month' },
                                             { value: 'ALTERNATE', label: 'Alternate Days', desc: '15 deliveries/month' },
                                             { value: 'WEEKLY', label: 'Once a Week', desc: '4 deliveries/month' },
+                                            { value: 'CUSTOM', label: 'Custom Schedule', desc: 'Pick your days' },
                                         ] as const).map(opt => (
                                             <button
                                                 key={opt.value}
-                                                onClick={() => setFrequency(opt.value)}
+                                                onClick={() => setFrequency(opt.value as typeof frequency)}
                                                 className={`btn ${frequency === opt.value ? 'btn-primary' : 'btn-ghost'}`}
                                                 style={{ flexDirection: 'column', padding: '12px 20px', height: 'auto' }}
                                             >
@@ -294,6 +297,31 @@ export default function SubscriptionPage() {
                                             </button>
                                         ))}
                                     </div>
+
+                                    {/* Custom day picker */}
+                                    {frequency === 'CUSTOM' && (
+                                        <div style={{ marginTop: '12px' }}>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--gray-500)', marginBottom: '8px' }}>Select delivery days:</label>
+                                            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                                {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map(day => (
+                                                    <button
+                                                        key={day}
+                                                        type="button"
+                                                        onClick={() => setDeliveryDays(prev => prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day])}
+                                                        className={`btn btn-sm ${deliveryDays.includes(day) ? 'btn-primary' : 'btn-ghost'}`}
+                                                        style={{ minWidth: '52px', padding: '8px 12px', fontSize: '13px' }}
+                                                    >
+                                                        {day}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            {deliveryDays.length > 0 && (
+                                                <p style={{ fontSize: '12px', color: 'var(--gray-500)', marginTop: '8px' }}>
+                                                    {deliveryDays.length} day{deliveryDays.length > 1 ? 's' : ''}/week — ~{Math.round(deliveryDays.length * 4.3)} deliveries/month
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Step 3: Quantity */}
