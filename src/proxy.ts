@@ -34,7 +34,7 @@ async function verifyJWT(token: string): Promise<TokenPayload | null> {
     }
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl
 
     // ─── Cron routes: verify CRON_SECRET ───
