@@ -1,0 +1,14 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "in.milkali.twa",
+            "sha256_cert_fingerprints": [
+                "D6:94:2F:71:D1:ED:24:E5:FF:78:8A:0B:D4:F8:73:A2:74:94:BA:9D:9C:A5:98:9A:5E:9D:55:4B:56:9F:0D:77"
+            ]
+        }
+    }
+]
